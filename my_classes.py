@@ -74,8 +74,8 @@ class Record:
         return birthday
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
-            #    f"birthday: {str(self.birthday)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, "\
+               f"birthday: {str(self.birthday)}"
     
 
 class AddressBook(UserDict):
@@ -91,10 +91,18 @@ class AddressBook(UserDict):
 
     def get_upcoming_birthdays(self):
         current_date = datetime.today().date() # визначаємо поточну дату
+        congratulations = []
         result = ''
         for name in self.data:
-            congratulation_date = self.data[name].birthday.value.replace(year=2024)
-            if current_date <= congratulation_date <= current_date + timedelta(days=6): # Беремо дати в найближчі 7 днів з сьогоднішнього
+            congratulation_date = current_date
+            birthday_this_year = self.data[name].birthday.value.replace(year=2024)
+            if current_date <= birthday_this_year <= current_date + timedelta(days=6): # Беремо дати в найближчі 7 днів з сьогоднішнього
+                if birthday_this_year.weekday() == 5: # якщо день народження (д.н.) припадає на суботу, вітання переносимо на ПН
+                    congratulation_date = birthday_this_year.replace(day=birthday_this_year.day + 2)
+                elif birthday_this_year.weekday() == 6: # якщо д.н. припадає на неділю, вітання переносимо на ПН
+                    congratulation_date = birthday_this_year.replace(day=birthday_this_year.day + 1)
+                else:
+                    congratulation_date = birthday_this_year # якщо д.н. припадає на інший день тижня, вітаємо в д.н.
                 result += f"{name}: {congratulation_date.strftime("%d.%m.%Y")}\n"
         return result
 

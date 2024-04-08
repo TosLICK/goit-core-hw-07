@@ -45,16 +45,14 @@ def delete_contact(args, book: AddressBook):
     book.delete(name)
     return "Contact deleted"
 
-"""
-@input_error
+# @input_error
 def change_contact(args, book: AddressBook): # змінюємо номер телефону, якщо контакт присутній у словнику
-    name, phone, *_ = args
-    if name in contacts:
-        contacts[name] = phone
-        return "Contact updated."
-    else:
-        return no_contact() # якщо контакту немає, виводимо відповідне повідомлення
-"""
+    name, old_number, new_number, *_ = args
+    record = book.find(name)
+    if record is None:
+        return no_contact()
+    record.edit_phone(old_number, new_number)
+    return "Number changed"
 
 @input_error
 def show_phone(args, book: AddressBook): # виводимо номер телефону за заданим ім'ям контакту
@@ -76,8 +74,9 @@ def add_birthday(args, book: AddressBook):
     if book[name].birthday:
         book[name].add_birthday(birthday)
         return "Birthday updated"
-    book[name].add_birthday(birthday)
-    return "Birthday added"
+    else:
+        book[name].add_birthday(birthday)
+        return "Birthday added"
 
 @input_error
 def show_birthday(args, book: AddressBook):
@@ -103,7 +102,7 @@ def no_contact():
 functions = {
     "hello": hello,
     "add": add_contact,
-    # "change": change_contact,
+    "change": change_contact,
     "phone": show_phone,
     "all": show_all,
     "delete": delete_contact,
